@@ -1,7 +1,7 @@
 import collections
 
 class HelperIterator:
-    def __init__(self, iterator, fields):
+    def __init__(self, *, iterator, fields):
         self.iterator = iterator
         self.field_names = [x[0] for x in fields]
         
