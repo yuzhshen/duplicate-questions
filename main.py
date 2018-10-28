@@ -1,11 +1,11 @@
 import torch
 from torch import nn
 from torchtext import data
-import spacy
 import torchtext_helper as helper
+import util
 
 # files
-TRAIN_PATH = 'data/med_train.csv'
+TRAIN_PATH = 'data/small_train.csv' # TODO: change back
 VAL_PATH = 'data/small_train.csv'
 TEST_PATH = 'data/test.csv'
 # representation
@@ -39,18 +39,13 @@ class Model(nn.Module):
         output = self.softmax(self.linear2(hl1_out))
         return output
 
-nlp = spacy.load('en')
-
-def tokenizer(text):
-    return [x.lemma_ for x in nlp(text)]
-
-TEXT = data.Field(sequential=True, tokenize=tokenizer, fix_length=50)
+TEXT = data.Field(sequential=True, tokenize=util.tokenizer, fix_length=50)
 NUMBER = data.Field(sequential=False, use_vocab=False, preprocessing=int)
 fields = [('pairID',NUMBER), ('id1',NUMBER), ('id2',NUMBER), ('q1',TEXT), ('q2',TEXT), ('y',NUMBER)]
 
 train, val = data.TabularDataset.splits(
     path='', train=TRAIN_PATH, validation=VAL_PATH,
-    format='csv', 
+    format='csv',
     skip_header=True,
     fields=fields
 )
@@ -62,6 +57,7 @@ train_iter, val_iter = data.Iterator.splits(
     (train, val),
     batch_sizes=(TRAIN_BATCH_SIZE, ELSE_BATCH_SIZE),
     repeat=False,
+    shuffle=True,
     sort_key=lambda x: len(x.q1),
     device=-1)
 
@@ -75,12 +71,18 @@ net = Model()
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(net.parameters(), weight_decay=0.0001)
 for epoch in range(NUM_EPOCHS):
-    for batch in helper.HelperIterator(iterator = train_iter, fields = fields):
+    for batch in train_iter:
+        q1, q2, labels = embed(getattr(batch,'q1')), embed(getattr(batch,'q2')), getattr(batch,'y')
         optimizer.zero_grad()
-        batch_q1, batch_q2 = embed(batch.q1), embed(batch.q2)
-        batch_y = net(batch_q1, batch_q2)
-        batch_target = batch.y.view(-1)
-        loss = criterion(batch_y, batch_target)
+        preds = net(q1, q2)
+        labels = labels.view(-1)
+        loss = criterion(preds, labels)
+        # transform network output to labeled guess
+
+        acc_correct = int((preds.max(1)[1].view(-1)==labels).sum())
+        acc_total = TRAIN_BATCH_SIZE
+        print('Accuracy: '+str(acc_correct/acc_total))
+
         loss.backward()
         optimizer.step()
     val_loss = 0
