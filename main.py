@@ -3,6 +3,8 @@ from torch import nn
 from torchtext import data
 import torchtext_helper as helper
 import util
+from preprocessing import augmented, clean_string
+
 
 # files
 TRAIN_PATH = 'data/small_train.csv' # TODO: change back
@@ -60,6 +62,8 @@ train_iter, val_iter = data.Iterator.splits(
     shuffle=True,
     sort_key=lambda x: len(x.q1),
     device=-1)
+
+print(type(train))
 
 vocab = TEXT.vocab
 embed = nn.Embedding(len(vocab), WORD_EMBED_DIM)
