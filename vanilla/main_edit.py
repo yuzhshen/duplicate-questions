@@ -31,7 +31,6 @@ class Model(nn.Module):
         output = self.softmax(self.linear2(hl1_out))
         return output
 
-
 class QuestionsDataset(Dataset):
 
     def __init__(self, data_frame, *, is_val, glove):
