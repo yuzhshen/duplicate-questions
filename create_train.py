@@ -25,9 +25,11 @@ word2vect = pickle.load(open(c.GLOVE_FILEPATH+'.pydict.pkl', 'rb'))
 print('Solving constrained optimizations...')
 matrix_volume = []
 label_volume = []
+save_batch = 0
+ex_per_batch = 100000
 total_iters = len(train_df)
 for idx in range(total_iters):
-    if idx%1000==0:
+    if idx%10000==0:
         print('Iteration {} / {}'.format(idx+1, total_iters))
     goal_str = train_df.loc[idx,:]['question1']
     use_str = train_df.loc[idx,:]['question1']
@@ -54,9 +56,12 @@ for idx in range(total_iters):
             matrix[g_idx] = res.x
     matrix_volume.append(matrix)
     label_volume.append(train_df.loc[idx,:]['is_duplicate'])
-
-print('Writing data to disk...')
-matrix_volume = np.array(matrix_volume)
-label_volume = np.array(label_volume)
-np.save('training_matrices.npy', matrix_volume)
-np.save('training_labels.npy', label_volume)
+    if (idx+1)//ex_per_batch > idx//ex_per_batch or idx==total_iters-1:
+        print('Writing batch {} data to disk...'.format(save_batch))
+        matrix_volume = np.array(matrix_volume)
+        label_volume = np.array(label_volume)
+        np.save('training/training_matrices_b{}.npy'.format(save_batch), matrix_volume)
+        np.save('training/training_labels_b{}.npy'.format(save_batch), label_volume)
+        matrix_volume = []
+        label_volume = []
+        save_batch+=1
