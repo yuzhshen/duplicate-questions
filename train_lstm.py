@@ -23,7 +23,7 @@ class MatrixDataset(Dataset):
 
     def __getitem__(self, idx):
         
-        return {'matrix':np.swapaxes(self.matrices[idx],0,1), 'label':self.labels[idx]}
+        return {'matrix':self.matrices[idx], 'label':self.labels[idx]}
 
 class LstmNet(nn.Module):
 
@@ -61,7 +61,8 @@ if __name__ == '__main__':
             print('Loading data fragment {}...'.format(i))
             dl = DataLoader(MatrixDataset(i), batch_size=c.TRAIN_BATCH_SIZE, shuffle=True)
             for batch in dl:
-                data = torch.tensor(batch['matrix'],dtype=torch.float32).cuda()
+                data = np.swapaxes(batch['matrix'],0,1)
+                data = torch.tensor(data, dtype=torch.float32).cuda()
                 label = torch.tensor(batch['label'],dtype=torch.int32).cuda()
                 print(data.size(), data.dtype)
                 print(label.size(), label.dtype)
