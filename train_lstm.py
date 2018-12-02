@@ -38,9 +38,10 @@ class LstmNet(nn.Module):
         self.fc3 = nn.Linear(25,2)
     
     def forward(self, x):
-        x = self.lstm(x)
+        x, (_,_) = self.lstm(x)
+        print(x.size())
         x = x[-1]
-        print(x)
+        print(x.size())
         x = nn.LeakyReLU()(self.bn1(self.fc1(x)))
         x = nn.LeakyReLU()(self.bn2(self.fc2(x)))
         x = nn.Softmax(dim=1)(self.fc3(x))
@@ -59,7 +60,7 @@ if __name__ == '__main__':
             print('Loading data fragment {}...'.format(i))
             dl = DataLoader(MatrixDataset(i), batch_size=c.TRAIN_BATCH_SIZE, shuffle=True)
             for batch in dl:
-                data = torch.tensor(batch['matrix']).cuda()
+                data = torch.tensor(batch['matrix'],dtype=torch.float32).cuda()
                 label = torch.tensor(batch['label'],dtype=torch.int32).cuda()
                 print(data.size(), data.dtype)
                 print(label.size(), label.dtype)
@@ -82,7 +83,8 @@ if __name__ == '__main__':
             f1s = []
             for batch in dl:
                 if len(batch)==c.ELSE_BATCH_SIZE:
-                    preds = net(batch['matrix'])
+                    preds = net(torch.tensor(batch['matrix'],dtype=torch.float32))
+                    labels = torch.tensor(batch['label'],dtype=torch.int32)
                     accs.append(float((preds.max(1)[1]==batch['label']).sum().float()/len(preds)))
                     f1s.append(f1_score(preds.max(1)[1], batch['label']))
             f1_score = sum(f1s)/len(f1s)
