@@ -77,6 +77,7 @@ if __name__ == '__main__':
             accs = []
             f1s = []
             for batch in dl:
+                print(len(batch))
                 if len(batch)==c.ELSE_BATCH_SIZE:
                     data = np.swapaxes(batch['matrix'],0,1)
                     data = torch.tensor(data, dtype=torch.float32).cuda()
@@ -84,8 +85,8 @@ if __name__ == '__main__':
                     preds = net(data)
                     accs.append(float((preds.max(1)[1]==target).sum().float()/len(preds)))
                     f1s.append(f1_score(preds.max(1)[1], target))
-            f1_score = sum(f1s)/len(f1s)
             acc_score = sum(accs)/len(accs)
+            f1_score = sum(f1s)/len(f1s)
             print('End of Epoch {}\tAccuracy:{}\tF1:{}'.format(e,acc_score,f1_score))
 
     torch.save(net,'net.pt')
