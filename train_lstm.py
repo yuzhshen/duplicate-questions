@@ -70,6 +70,7 @@ if __name__ == '__main__':
                 target = torch.tensor(one_hot_list).float()
                 preds = net(data)
                 # convert label to one-hot
+                print(preds.dtype, target.dtype)
                 loss = loss_func(preds, target)
                 loss.backward()
                 opt.step()
