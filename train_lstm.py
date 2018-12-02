@@ -77,8 +77,7 @@ if __name__ == '__main__':
             accs = []
             f1s = []
             for batch in dl:
-                print(len(batch))
-                if len(batch)==c.ELSE_BATCH_SIZE:
+                if len(batch['label'])==c.ELSE_BATCH_SIZE:
                     data = np.swapaxes(batch['matrix'],0,1)
                     data = torch.tensor(data, dtype=torch.float32).cuda()
                     target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
