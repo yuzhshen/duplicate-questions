@@ -40,6 +40,7 @@ class LstmNet(nn.Module):
     def forward(self, x):
         x = self.lstm(x)
         x = x[-1]
+        print(x)
         x = nn.LeakyReLU()(self.bn1(self.fc1(x)))
         x = nn.LeakyReLU()(self.bn2(self.fc2(x)))
         x = nn.Softmax(dim=1)(self.fc3(x))
