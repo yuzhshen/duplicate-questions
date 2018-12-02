@@ -82,6 +82,8 @@ if __name__ == '__main__':
                     data = torch.tensor(data, dtype=torch.float32).cuda()
                     target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
                     preds = net(data)
+                    print(preds.max(1)[1].size(), preds.max(1)[1].dtype)
+                    print(target.size(), target.dtype)
                     accs.append(float((preds.max(1)[1]==target).sum().float()/len(preds)))
                     f1s.append(f1_score(preds.max(1)[1], target))
             acc_score = sum(accs)/len(accs)
