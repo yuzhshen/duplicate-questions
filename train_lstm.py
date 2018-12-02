@@ -23,7 +23,7 @@ class MatrixDataset(Dataset):
 
     def __getitem__(self, idx):
         
-        return {'matrix':np.swapaxes(self.matrices[idx],0,1), 'label':self.matrices[idx]}
+        return {'matrix':np.swapaxes(self.matrices[idx],0,1), 'label':self.labels[idx]}
 
 class LstmNet(nn.Module):
 
