@@ -28,7 +28,7 @@ class LstmNet(nn.Module):
 
     def __init__(self):
         super(LstmNet, self).__init__()
-        self.lstm = nn.LSTM(input_size = c.WORD_EMBED_DIM,
+        self.lstm = nn.LSTM(input_size = c.SENT_INCLUSION_MAX,
                             hidden_size = 100,
                             num_layers = 2)
         self.fc1 = nn.Linear(100,50)
