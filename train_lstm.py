@@ -61,7 +61,7 @@ if __name__ == '__main__':
                 data = np.swapaxes(batch['matrix'],0,1)
                 data = torch.tensor(data, dtype=torch.float32).cuda()
                 target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
-                print([max(x) for x in data])
+                print([x.max() for x in data])
                 print(target)
                 raise NotImplementedError()
                 preds = net(data)
