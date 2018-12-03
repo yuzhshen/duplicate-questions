@@ -3,8 +3,7 @@ WORD_EMBED_DIM = 50
 
 # training hyperparameters
 NUM_EPOCHS = 10
-TRAIN_BATCH_SIZE = 64
-ELSE_BATCH_SIZE = 256
+BATCH_SIZE = 64
 NUM_FOLDS = 10 # determines size of validation set
 
 # preprocessing
