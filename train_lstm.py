@@ -50,46 +50,50 @@ if __name__ == '__main__':
     net = LstmNet().cuda()
     opt = optim.Adam(net.parameters())
     loss_func = nn.CrossEntropyLoss()
+    dl = DataLoader(MatrixDataset(10), batch_size=c.ELSE_BATCH_SIZE, shuffle=True)
+    for batch in dl:
+        print(torch.zeros(c.ELSE_BATCH_SIZE,dtype=torch.int64)==batch['label'])
 
-    for e in range(c.NUM_EPOCHS):
-        net.train()
-        batch_num = 0
-        for i in range(1): #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11
-            print('Loading data fragment {}...'.format(i))
-            dl = DataLoader(MatrixDataset(i), batch_size=c.TRAIN_BATCH_SIZE, shuffle=True)
-            for batch in dl:
-                data = np.swapaxes(batch['matrix'],0,1)
-                data = torch.tensor(data, dtype=torch.float32).cuda()
-                target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
-                preds = net(data)
-                loss = loss_func(preds, target)
-                loss.backward()
-                opt.step()
-                acc = (preds.max(1)[1]==target).sum().float()/len(preds)
-                if batch_num%10==0:
-                    print('Epoch:{}\tBatch:{}\tLoss:{}\tAccuracy:{}'.format(e+1, batch_num, loss, acc))
-                batch_num+=1
-        print('Calculating validation statistics...')
-        dl = DataLoader(MatrixDataset(10), batch_size=c.ELSE_BATCH_SIZE, shuffle=True)
-        with torch.no_grad():
-            net.eval()
-            accs = []
-            f1s = []
-            for batch in dl:
-                if len(batch['label'])==c.ELSE_BATCH_SIZE:
-                    data = np.swapaxes(batch['matrix'],0,1)
-                    data = torch.tensor(data, dtype=torch.float32).cuda()
-                    target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
-                    preds = net(data)
-                    print(data)
-                    print(target)
-                    print(preds.max(1)[1])
-                    print(target)
-                    raise NotImplementedError()
-                    accs.append(float((preds.max(1)[1]==target).sum().float()/len(preds)))
-                    f1s.append(f1_score(preds.max(1)[1], target))
-            acc_score = sum(accs)/len(accs)
-            f1_score = sum(f1s)/len(f1s)
-            print('End of Epoch {}\tAccuracy:{}\tF1:{}'.format(e,acc_score,f1_score))
+    # for e in range(c.NUM_EPOCHS):
+    #     net.train()
+    #     batch_num = 0
+    #     for i in range(1): #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11 #TODO: CHANGE BACK TO 11
+    #         print('Loading data fragment {}...'.format(i))
+    #         dl = DataLoader(MatrixDataset(i), batch_size=c.TRAIN_BATCH_SIZE, shuffle=True)
+    #         for batch in dl:
+    #             opt.zero_grad()
+    #             data = np.swapaxes(batch['matrix'],0,1)
+    #             data = torch.tensor(data, dtype=torch.float32).cuda()
+    #             target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
+    #             preds = net(data)
+    #             loss = loss_func(preds, target)
+    #             loss.backward()
+    #             opt.step()
+    #             acc = (preds.max(1)[1]==target).sum().float()/len(preds)
+    #             if batch_num%10==0:
+    #                 print('Epoch:{}\tBatch:{}\tLoss:{}\tAccuracy:{}'.format(e+1, batch_num, loss, acc))
+    #             batch_num+=1
+    #     print('Calculating validation statistics...')
+    #     dl = DataLoader(MatrixDataset(10), batch_size=c.ELSE_BATCH_SIZE, shuffle=True)
+    #     with torch.no_grad():
+    #         net.eval()
+    #         accs = []
+    #         f1s = []
+    #         for batch in dl:
+    #             if len(batch['label'])==c.ELSE_BATCH_SIZE:
+    #                 data = np.swapaxes(batch['matrix'],0,1)
+    #                 data = torch.tensor(data, dtype=torch.float32).cuda()
+    #                 target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
+    #                 preds = net(data)
+    #                 print(data)
+    #                 print(target)
+    #                 print(preds.max(1)[1])
+    #                 print(target)
+    #                 raise NotImplementedError()
+    #                 accs.append(float((preds.max(1)[1]==target).sum().float()/len(preds)))
+    #                 f1s.append(f1_score(preds.max(1)[1], target))
+    #         acc_score = sum(accs)/len(accs)
+    #         f1_score = sum(f1s)/len(f1s)
+    #         print('End of Epoch {}\tAccuracy:{}\tF1:{}'.format(e,acc_score,f1_score))
 
-    torch.save(net,'net.pt')
+    # torch.save(net,'net.pt')
