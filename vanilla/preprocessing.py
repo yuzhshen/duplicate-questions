@@ -7,14 +7,15 @@ from nltk.stem.wordnet import WordNetLemmatizer
 NUM_FOLDS = 10
 SENT_INCLUSION_MIN = 3
 SENT_INCLUSION_MAX = 50
-WNL = WordNetLemmatizer()
+WNL = 
 
 def lemmatizer(word):
     """Returns: lemmatized word if word >= length 5
     """
+    wnl = WordNetLemmatizer()
     if len(word)<4:
         return word
-    return WNL.lemmatize(WNL.lemmatize(word, "n"), "v")
+    return wnl.lemmatize(wnl.lemmatize(word, "n"), "v")
 
 def clean_string(string): # From kaggle-quora-dup submission
     """Returns: cleaned string, with common token replacements and lemmatization

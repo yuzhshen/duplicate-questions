@@ -51,27 +51,29 @@ if __name__ == '__main__':
     opt = optim.Adam(net.parameters())
     loss_func = nn.CrossEntropyLoss()
 
-    print('Loading datasets...')
-    train_dl = DataLoader(MatrixDataset(is_val=False), batch_size=c.BATCH_SIZE, shuffle=True)
-    val_dl = DataLoader(MatrixDataset(is_val=True), batch_size=c.BATCH_SIZE, shuffle=True)
+    print('Loading val data...')
+    val_dl = DataLoader(MatrixDataset(7), batch_size=c.BATCH_SIZE, shuffle=True)
 
     print('Training...')
-    for e in range(30):
+    for e in range(20):
         net.train()
         batch_num = 0
-        for batch in train_dl:
-            opt.zero_grad()
-            data = np.swapaxes(batch['matrix'],0,1)
-            data = torch.tensor(data, dtype=torch.float32).cuda()
-            target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
-            preds = net(data)
-            loss = loss_func(preds, target)
-            loss.backward()
-            opt.step()
-            acc = (preds.max(1)[1]==target).sum().float()/len(preds)
-            if batch_num%10==0:
-                print('Epoch:{}\tBatch:{}\tLoss:{:.3f}\tAccuracy:{:.3f}'.format(e+1, batch_num, loss, acc))
-            batch_num+=1
+        for npy_num in range(7):
+            print('Loading train data...')
+            train_dl = DataLoader(MatrixDataset(npy_num), batch_size=c.BATCH_SIZE, shuffle=True)
+            for batch in train_dl:
+                opt.zero_grad()
+                data = np.swapaxes(batch['matrix'],0,1)
+                data = torch.tensor(data, dtype=torch.float32).cuda()
+                target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
+                preds = net(data)
+                loss = loss_func(preds, target)
+                loss.backward()
+                opt.step()
+                acc = (preds.max(1)[1]==target).sum().float()/len(preds)
+                if batch_num%10==0:
+                    print('Epoch:{}\tBatch:{}\tLoss:{:.3f}\tAccuracy:{:.3f}'.format(e+1, batch_num, loss, acc))
+                batch_num+=1
             
         print('Calculating validation statistics...')
         with torch.no_grad():

@@ -3,8 +3,6 @@ Duplicate question detection for document question answering
 
 - Run create_train.py to save a dataset
 
-
-
 - Notes about linear program
     - if padding or unknown, use 0 vector
     - for the optimization objective, use entropy, but most improvement would probably be found here.
