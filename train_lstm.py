@@ -22,7 +22,6 @@ class MatrixDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        
         return {'matrix':self.matrices[idx], 'label':self.labels[idx]}
 
 class LstmNet(nn.Module):
@@ -62,6 +61,9 @@ if __name__ == '__main__':
                 data = np.swapaxes(batch['matrix'],0,1)
                 data = torch.tensor(data, dtype=torch.float32).cuda()
                 target = torch.tensor(batch['label'],dtype=torch.int64).cuda()
+                print(data)
+                print(target)
+                raise NotImplementedError()
                 preds = net(data)
                 loss = loss_func(preds, target)
                 loss.backward()
