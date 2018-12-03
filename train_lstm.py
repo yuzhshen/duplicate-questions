@@ -14,17 +14,9 @@ torch.manual_seed(1)
 
 class MatrixDataset(Dataset):
 
-    def __init__(self, is_val):
-        self.matrices = np.load('training/tr_matrices_good_b0.npy'.format(save_batch))      #TODO: change to best
-        self.labels = np.load('training/tr_labels_good_b0.npy'.format(save_batch))          #TODO: change to best
-        N = len(self.labels)
-        split = int(0.9*N)
-        if is_val:
-            self.matrices = self.matrices[split:]
-            self.labels = self.labels[split:]
-        else:
-            self.matrices = self.matrices[:split]
-            self.labels = self.labels[:split]
+    def __init__(self, num):
+        self.matrices = np.load('training/tr_matrices_best_b{}.npy'.format(num))
+        self.labels = np.load('training/tr_labels_best_b{}.npy'.format(num))
 
     def __len__(self):
         return len(self.labels)
@@ -37,13 +29,13 @@ class LstmNet(nn.Module):
     def __init__(self):
         super(LstmNet, self).__init__()
         self.lstm = nn.LSTM(input_size = c.SENT_INCLUSION_MAX,
-                            hidden_size = 100,
+                            hidden_size = 200,
                             num_layers = 2)
-        self.fc1 = nn.Linear(100,50)
-        self.bn1 = nn.BatchNorm1d(50)
-        self.fc2 = nn.Linear(50,25)
-        self.bn2 = nn.BatchNorm1d(25)
-        self.fc3 = nn.Linear(25,2)
+        self.fc1 = nn.Linear(200,100)
+        self.bn1 = nn.BatchNorm1d(100)
+        self.fc2 = nn.Linear(100,50)
+        self.bn2 = nn.BatchNorm1d(50)
+        self.fc3 = nn.Linear(50,2)
     
     def forward(self, x):
         x, (_,_) = self.lstm(x)
@@ -64,7 +56,7 @@ if __name__ == '__main__':
     val_dl = DataLoader(MatrixDataset(is_val=True), batch_size=c.BATCH_SIZE, shuffle=True)
 
     print('Training...')
-    for e in range(c.NUM_EPOCHS):
+    for e in range(30):
         net.train()
         batch_num = 0
         for batch in train_dl:
@@ -78,7 +70,7 @@ if __name__ == '__main__':
             opt.step()
             acc = (preds.max(1)[1]==target).sum().float()/len(preds)
             if batch_num%10==0:
-                print('Epoch:{}\tBatch:{}\tLoss:{}\tAccuracy:{}'.format(e+1, batch_num, loss, acc))
+                print('Epoch:{}\tBatch:{}\tLoss:{:.3f}\tAccuracy:{:.3f}'.format(e+1, batch_num, loss, acc))
             batch_num+=1
             
         print('Calculating validation statistics...')
@@ -99,8 +91,8 @@ if __name__ == '__main__':
                     # raise NotImplementedError()
                     accs.append(float((preds.max(1)[1]==target).sum().float()/len(preds)))
                     f1s.append(f1_score(preds.max(1)[1], target))
-            acc_score = sum(accs)/len(accs)
-            f1_score = sum(f1s)/len(f1s)
-            print('End of Epoch {}\tAccuracy:{}\tF1:{}'.format(e,acc_score,f1_score))
+            acc_final = sum(accs)/len(accs)
+            f1_final = sum(f1s)/len(f1s)
+            print('End of Epoch {}\tAccuracy:{:.3f}\tF1:{:.3f}'.format(e,acc_final,f1_final))
 
     torch.save(net,'net.pt')

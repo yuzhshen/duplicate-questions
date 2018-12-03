@@ -26,7 +26,7 @@ print('Solving constrained optimizations...')
 matrix_volume = []
 label_volume = []
 save_batch = 0
-ex_per_batch = 100000
+ex_per_batch = 10000
 total_iters = len(train_df)
 for idx in range(100000):
     if idx%10000==0:
