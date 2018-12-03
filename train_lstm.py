@@ -50,7 +50,7 @@ if __name__ == '__main__':
     net = LstmNet().cuda()
     opt = optim.Adam(net.parameters())
     loss_func = nn.CrossEntropyLoss()
-    dl = DataLoader(MatrixDataset(10), batch_size=c.ELSE_BATCH_SIZE, shuffle=True)
+    dl = DataLoader(MatrixDataset(1), batch_size=c.ELSE_BATCH_SIZE, shuffle=True)
     for batch in dl:
         print(torch.zeros(c.ELSE_BATCH_SIZE,dtype=torch.int64)==batch['label'])
 

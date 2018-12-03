@@ -28,11 +28,11 @@ label_volume = []
 save_batch = 0
 ex_per_batch = 100000
 total_iters = len(train_df)
-for idx in range(total_iters):
+for idx in range(100000):
     if idx%10000==0:
         print('Iteration {} / {}'.format(idx+1, total_iters))
     goal_str = train_df.loc[idx,:]['question1']
-    use_str = train_df.loc[idx,:]['question1']
+    use_str = train_df.loc[idx,:]['question2']
     goal_vecs = u.vector_list(word2vect, goal_str)
     use_vecs = np.array(u.vector_list(word2vect, use_str))
     matrix = np.zeros((c.SENT_INCLUSION_MAX,c.SENT_INCLUSION_MAX))
@@ -53,15 +53,15 @@ for idx in range(total_iters):
                                         method='SLSQP', 
                                         constraints=[constraint1,constraint2],
                                         bounds=bound)
-            matrix[g_idx] = res.x
+            matrix[g_idx] = np.nan_to_num(res.x)
     matrix_volume.append(matrix)
     label_volume.append(train_df.loc[idx,:]['is_duplicate'])
     if (idx+1)//ex_per_batch > idx//ex_per_batch or idx==total_iters-1:
         print('Writing batch {} data to disk...'.format(save_batch))
         matrix_volume = np.array(matrix_volume)
         label_volume = np.array(label_volume)
-        np.save('training/training_matrices_b{}.npy'.format(save_batch), matrix_volume)
-        np.save('training/training_labels_b{}.npy'.format(save_batch), label_volume)
+        np.save('training/tr_matrices_best_b{}.npy'.format(save_batch), matrix_volume)
+        np.save('training/tr_labels_best_b{}.npy'.format(save_batch), label_volume)
         matrix_volume = []
         label_volume = []
         save_batch+=1
