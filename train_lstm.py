@@ -70,7 +70,7 @@ if __name__ == '__main__':
                     print('Epoch:{}\tBatch:{}\tLoss:{}\tAccuracy:{}'.format(e+1, batch_num, loss, acc))
                 batch_num+=1
         print('Calculating validation statistics...')
-        dl = DataLoader(MatrixDataset(11), batch_size=c.ELSE_BATCH_SIZE)
+        dl = DataLoader(MatrixDataset(10), batch_size=c.ELSE_BATCH_SIZE, shuffle=True)
         with torch.no_grad():
             net.eval()
             accs = []
